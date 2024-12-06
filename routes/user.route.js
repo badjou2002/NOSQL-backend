@@ -3,7 +3,6 @@ const router = express.Router();
 const User = require("../models/user")
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
 
 router.post('/forgot-password', (req, res) => {
     const { email } = req.body;
@@ -53,13 +52,8 @@ router.post('/reset_password/:id/:token', async (req, res) => {
         if (err) {
             return res.json({ Status: "Error with token" })
         } else {
-            const salt = await bcrypt.genSalt(10);
-            await bcrypt.hash(password, salt)
-                .then(hash => {
-                    User.findByIdAndUpdate({ _id: id }, { password: hash })
-                        .then(u => res.send({ Status: "Success" }))
-                        .catch(err => res.send({ Status: err }))
-                })
+            User.findByIdAndUpdate({ _id: id }, { password: password })
+                .then(u => res.send({ Status: "Success" }))
                 .catch(err => res.send({ Status: err }))
         }
     })
@@ -94,7 +88,7 @@ router.post('/login', async (req, res) => {
 
         } else {
 
-            let isCorrectPassword = await bcrypt.compare(password, user.password)
+            let isCorrectPassword = password == user.password
             if (isCorrectPassword) {
 
                 delete user._doc.password
