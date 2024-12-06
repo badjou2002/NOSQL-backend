@@ -23,7 +23,7 @@ route.get('/pagination', async (req, res) => {
     }
 });
 
-route.get('/', verifyToken, async (req, res) => {
+route.get('/', async (req, res) => {
     try {
         const articles = await Article.find({}, null, {
             sort: {
